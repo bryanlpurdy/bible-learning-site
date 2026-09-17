@@ -591,8 +591,8 @@
 <section class="verse-section">
   <div class="verse-card">
     <div class="verse-label">A verse for you today</div>
-    <p class="verse-text">"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."</p>
-    <div class="verse-ref">John 3:16</div>
+    <p class="verse-text" id="verseText">"For God had such love for the world that he gave his only Son, so that whoever has faith in him may not come to destruction but have eternal life."</p>
+    <div class="verse-ref" id="verseRef">John 3:16</div>
     <button class="btn-share" onclick="shareVerse()">Share this verse</button>
   </div>
 </section>
@@ -612,6 +612,70 @@
 </footer>
 
 <script>
+  // ── Supabase ──────────────────────────────────────────────────────────────
+  const SUPABASE_URL = 'https://api.bluestarrealtygroup.com';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwbGlkbWZpc2hhY2x5c2NrcnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODc2ODMsImV4cCI6MjA4OTc2MzY4M30.YEhxwrw-HxofmV4N3KRpbgDcT_a_OyqIkx49Wu7CjR0';
+
+  // ── Curated verse rotation (cycles daily) ────────────────────────────────
+  // b = book_id (1–66), c = chapter, v = verse
+  const DAILY_VERSES = [
+    { b: 43, c: 3,   v: 16  }, // John 3:16
+    { b: 19, c: 23,  v: 1   }, // Psalm 23:1
+    { b: 45, c: 8,   v: 28  }, // Romans 8:28
+    { b: 24, c: 29,  v: 11  }, // Jeremiah 29:11
+    { b: 50, c: 4,   v: 13  }, // Philippians 4:13
+    { b: 45, c: 5,   v: 8   }, // Romans 5:8
+    { b: 23, c: 40,  v: 31  }, // Isaiah 40:31
+    { b: 43, c: 14,  v: 6   }, // John 14:6
+    { b: 20, c: 3,   v: 5   }, // Proverbs 3:5
+    { b: 40, c: 6,   v: 33  }, // Matthew 6:33
+    { b: 46, c: 13,  v: 4   }, // 1 Corinthians 13:4
+    { b: 19, c: 46,  v: 10  }, // Psalm 46:10
+    { b: 43, c: 11,  v: 25  }, // John 11:25
+    { b: 45, c: 3,   v: 23  }, // Romans 3:23
+    { b: 49, c: 2,   v: 8   }, // Ephesians 2:8
+    { b: 40, c: 11,  v: 28  }, // Matthew 11:28
+    { b: 45, c: 6,   v: 23  }, // Romans 6:23
+    { b: 19, c: 119, v: 105 }, // Psalm 119:105
+    { b: 43, c: 8,   v: 12  }, // John 8:12
+    { b: 62, c: 4,   v: 8   }, // 1 John 4:8
+    { b: 40, c: 22,  v: 37  }, // Matthew 22:37
+    { b: 43, c: 1,   v: 1   }, // John 1:1
+    { b: 50, c: 4,   v: 6   }, // Philippians 4:6
+    { b: 48, c: 5,   v: 22  }, // Galatians 5:22
+    { b: 55, c: 3,   v: 16  }, // 2 Timothy 3:16
+    { b: 43, c: 10,  v: 10  }, // John 10:10
+    { b: 19, c: 34,  v: 8   }, // Psalm 34:8
+    { b: 40, c: 5,   v: 3   }, // Matthew 5:3
+    { b: 45, c: 10,  v: 9   }, // Romans 10:9
+    { b: 58, c: 11,  v: 1   }, // Hebrews 11:1
+  ];
+
+  function getDayOfYear() {
+    const now   = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    return Math.floor((now - start) / 86400000) + 1;
+  }
+
+  async function loadVerseOfTheDay() {
+    const { b, c, v } = DAILY_VERSES[(getDayOfYear() - 1) % DAILY_VERSES.length];
+    try {
+      const res  = await fetch(
+        `${SUPABASE_URL}/rest/v1/bible_verses?book_id=eq.${b}&chapter=eq.${c}&verse=eq.${v}&select=book_name,chapter,verse,text`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+      const rows = await res.json();
+      if (rows && rows[0]) {
+        const r = rows[0];
+        document.getElementById('verseText').textContent = `“${r.text}”`;
+        document.getElementById('verseRef').textContent  = `${r.book_name} ${r.chapter}:${r.verse}`;
+      }
+    } catch (e) {
+      // Static fallback already in the HTML — no action needed
+    }
+  }
+
+  // ── Nav hamburger ─────────────────────────────────────────────────────────
   function toggleMenu() {
     document.getElementById('navDropdown').classList.toggle('open');
   }
@@ -623,9 +687,15 @@
     }
   });
 
+  // ── Share verse ───────────────────────────────────────────────────────────
   function shareVerse() {
-    alert('Share this verse — generates a ready-to-post image (coming soon).');
+    const text = document.getElementById('verseText').textContent;
+    const ref  = document.getElementById('verseRef').textContent;
+    alert(`Share: ${ref}\n\n${text}\n\n(Social image generation coming soon)`);
   }
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  loadVerseOfTheDay();
 </script>
 </body>
 </html>

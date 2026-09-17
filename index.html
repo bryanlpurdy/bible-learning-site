@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firstlight — Discover Scripture at Your Pace</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Spectral:wght@400;500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           oklch(0.97 0.012 75);
+      --surface:      oklch(0.995 0.004 75);
+      --border:       oklch(0.9 0.015 70);
+      --text:         oklch(0.28 0.02 50);
+      --muted:        oklch(0.45 0.02 50);
+      --muted2:       oklch(0.5 0.02 50);
+      --accent:       oklch(0.42 0.1 55);
+      --accent-soft:  oklch(0.42 0.06 55);
+      --accent-hover: oklch(0.36 0.06 55);
+      --accent-dark:  oklch(0.37 0.1 55);
+      --band:         oklch(0.95 0.025 65);
+      --hero-dark:    oklch(0.24 0.02 50);
+      --hero-sub:     oklch(0.36 0.025 50);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Work Sans', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    /* ── Hero region ─────────────────────────────── */
+    .hero-region {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('images/hero-image.png') center center / cover no-repeat;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, oklch(0.97 0.012 75 / 0.85) 0%, oklch(0.97 0.012 75 / 0.35) 42%, transparent 65%),
+        linear-gradient(180deg, transparent 70%, oklch(0.97 0.012 75) 100%);
+      pointer-events: none;
+    }
+
+    /* ── Header ──────────────────────────────────── */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+    .wordmark {
+      font-family: 'Spectral', serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+    .sign-in {
+      font-size: 15px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .sign-in:hover { text-decoration: underline; }
+
+    .hamburger {
+      background: oklch(0.995 0.004 75 / 0.9);
+      border: 1px solid oklch(0.85 0.015 70);
+      border-radius: 8px;
+      width: 42px;
+      height: 38px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: oklch(0.32 0.02 50);
+      border-radius: 1px;
+    }
+
+    /* ── Hamburger dropdown ───────────────────────── */
+    .nav-dropdown {
+      display: none;
+      position: absolute;
+      top: 54px;
+      right: 0;
+      z-index: 20;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 12px 30px oklch(0.4 0.05 60 / 0.15);
+      padding: 10px;
+      flex-direction: column;
+      min-width: 200px;
+    }
+    .nav-dropdown.open { display: flex; }
+    .nav-dropdown a {
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 15px;
+      transition: background 0.12s;
+    }
+    .nav-dropdown a:hover { background: oklch(0.96 0.015 70); }
+
+    /* ── Hero content ────────────────────────────── */
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 24px 140px;
+      min-height: 460px;
+      display: flex;
+      align-items: center;
+    }
+    .hero-inner { max-width: 720px; }
+
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(52px, 6vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin: 0 0 18px;
+      color: var(--hero-dark);
+    }
+    .eyebrow {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+      margin-bottom: 20px;
+    }
+    .divider-bar {
+      width: 56px;
+      height: 2px;
+      background: oklch(0.55 0.04 55);
+      margin-bottom: 22px;
+    }
+    .hero-sub {
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.65;
+      color: var(--hero-sub);
+      margin: 0 0 30px;
+    }
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-soft);
+      color: oklch(0.99 0.005 75);
+      font-family: 'Work Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 15px 30px;
+      border-radius: 999px;
+      transition: background 0.18s;
+    }
+    .btn-hero:hover { background: var(--accent-hover); }
+
+    /* ── Nav strip ───────────────────────────────── */
+    .nav-strip {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px 12px;
+    }
+    .nav-pills {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .nav-pill {
+      flex: 1 1 200px;
+      max-width: 240px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 15px;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .nav-pill:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px oklch(0.5 0.05 60 / 0.08);
+    }
+
+    /* ── Section divider ─────────────────────────── */
+    .section-divider {
+      height: 1px;
+      max-width: 1000px;
+      margin: 32px auto 0;
+      background: linear-gradient(90deg, transparent, oklch(0.85 0.02 65), transparent);
+    }
+
+    /* ── Popular starting points ─────────────────── */
+    .topics {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 56px 24px 24px;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .section-header h2 {
+      font-family: 'Spectral', serif;
+      font-weight: 500;
+      font-size: 30px;
+      margin: 0 0 8px;
+    }
+    .section-header p {
+      font-size: 16px;
+      color: var(--muted);
+    }
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .topic-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 22px;
+      text-decoration: none;
+      color: var(--text);
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .topic-card:hover {
+      box-shadow: 0 6px 18px oklch(0.5 0.05 60 / 0.1);
+      transform: translateY(-2px);
+    }
+    .topic-title {
+      font-size: 17px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .topic-desc {
+      font-size: 14px;
+      color: var(--muted2);
+    }
+
+    /* ── Visual explainers band ──────────────────── */
+    .explainers {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 72px 24px 24px;
+    }
+    .explainers-band {
+      background: var(--band);
+      border-radius: 20px;
+      padding: 40px 32px;
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .explainers-text { flex: 1 1 260px; }
+    .explainers-text h2 {
+      font-family: 'Spectral', serif;
+      font-weight: 500;
+      font-size: 26px;
+      margin: 0 0 10px;
+    }
+    .explainers-text p {
+      font-size: 15px;
+      color: oklch(0.42 0.03 55);
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+    .link-arrow {
+      font-size: 15px;
+      font-weight: 500;
+      color: oklch(0.4 0.09 55);
+      text-decoration: none;
+    }
+    .link-arrow:hover { text-decoration: underline; }
+    .explainers-icons { display: flex; gap: 20px; flex-wrap: wrap; }
+    .explainer-item { width: 128px; text-align: center; }
+    .icon-box {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 10px;
+      position: relative;
+    }
+    .icon-label { font-size: 13px; color: oklch(0.42 0.03 55); }
+
+    /* Trinity — 3 overlapping circles */
+    .icon-trinity .c {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: oklch(0.72 0.1 60 / 0.55);
+    }
+    .icon-trinity .c1 { top: 0; left: 14px; }
+    .icon-trinity .c2 { bottom: 0; left: 0; }
+    .icon-trinity .c3 { bottom: 0; right: 0; }
+
+    /* Timeline — line + dots */
+    .icon-timeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tl-line {
+      width: 60px; height: 3px;
+      background: oklch(0.72 0.1 60);
+      position: relative;
+    }
+    .tl-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: oklch(0.42 0.1 55);
+      top: -2.5px;
+    }
+    .tl-dot:nth-child(1) { left: 4px; }
+    .tl-dot:nth-child(2) { left: 28px; }
+    .tl-dot:nth-child(3) { left: 52px; }
+
+    /* Old vs New — split rectangle */
+    .icon-oldnew { display: flex; }
+    .icon-oldnew .half-l { flex: 1; background: oklch(0.72 0.1 60 / 0.55); border-radius: 6px 0 0 6px; }
+    .icon-oldnew .half-r { flex: 1; background: oklch(0.42 0.1 55 / 0.45); border-radius: 0 6px 6px 0; }
+
+    /* ── Verse of the day ────────────────────────── */
+    .verse-section {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 72px 24px 80px;
+    }
+    .verse-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
+      text-align: center;
+    }
+    .verse-label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: oklch(0.5 0.06 60);
+      margin-bottom: 18px;
+    }
+    .verse-text {
+      font-family: 'Spectral', serif;
+      font-size: 26px;
+      line-height: 1.5;
+      font-weight: 400;
+      color: oklch(0.26 0.02 50);
+      margin: 0 0 14px;
+    }
+    .verse-ref {
+      font-size: 15px;
+      color: var(--muted2);
+      margin-bottom: 24px;
+    }
+    .btn-share {
+      background: var(--accent);
+      color: oklch(0.99 0.005 75);
+      border: none;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 12px 26px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .btn-share:hover { background: var(--accent-dark); }
+
+    /* ── Footer ──────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-wordmark {
+      font-family: 'Spectral', serif;
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .footer-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .footer-links a:hover { text-decoration: underline; }
+    .footer-copy { font-size: 13px; color: oklch(0.55 0.02 50); }
+
+    /* ── Mobile ──────────────────────────────────── */
+    @media (max-width: 600px) {
+      .hero-content  { padding: 60px 24px 100px; }
+      .verse-card    { padding: 32px 24px; }
+      .verse-text    { font-size: 20px; }
+      .explainers-band { padding: 30px 24px; }
+      .footer-inner  { flex-direction: column; align-items: flex-start; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero region ──────────────────────────────── -->
+<div class="hero-region">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+
+  <header>
+    <a href="index.html" class="wordmark">Firstlight</a>
+    <div class="header-right">
+      <a href="#" class="sign-in">Sign in</a>
+      <button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-dropdown" id="navDropdown" aria-label="Site navigation">
+        <a href="#">Getting started</a>
+        <a href="#">Learning paths</a>
+        <a href="#">Search</a>
+        <a href="#">Ask a question</a>
+        <a href="#">Visual guides</a>
+        <a href="#">Verse of the day</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero-content">
+    <div class="hero-inner">
+      <h1>Discover a Deeper<br>Meaning</h1>
+      <div class="eyebrow">Explore &nbsp;•&nbsp; Learn &nbsp;•&nbsp; Grow</div>
+      <div class="divider-bar"></div>
+      <p class="hero-sub">A calm, guided way to explore scripture and understand who Jesus is — no background or experience needed.</p>
+      <a href="#nav" class="btn-hero">Start your journey <span>→</span></a>
+    </div>
+  </section>
+</div>
+
+<!-- ── Nav strip ────────────────────────────────── -->
+<section id="nav" class="nav-strip">
+  <div class="nav-pills">
+    <a href="#" class="nav-pill">Getting started</a>
+    <a href="#" class="nav-pill">Learning paths</a>
+    <a href="#" class="nav-pill">Search</a>
+    <a href="#" class="nav-pill">Ask a question</a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ── Popular starting points ───────────────────── -->
+<section class="topics">
+  <div class="section-header">
+    <h2>Popular starting points</h2>
+    <p>Where others like you began</p>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card">
+      <div class="topic-title">Who is Jesus?</div>
+      <div class="topic-desc">A gentle introduction</div>
+    </a>
+    <a href="#" class="topic-card">
+      <div class="topic-title">The Bible in 10 minutes</div>
+      <div class="topic-desc">The whole story, briefly</div>
+    </a>
+    <a href="#" class="topic-card">
+      <div class="topic-title">Facing grief</div>
+      <div class="topic-desc">Comfort, honestly offered</div>
+    </a>
+    <a href="#" class="topic-card">
+      <div class="topic-title">Old vs New Testament</div>
+      <div class="topic-desc">What's the difference?</div>
+    </a>
+    <a href="#" class="topic-card">
+      <div class="topic-title">Where do I even start?</div>
+      <div class="topic-desc">For total beginners</div>
+    </a>
+    <a href="#" class="topic-card">
+      <div class="topic-title">Is the Bible reliable?</div>
+      <div class="topic-desc">Honest questions welcome</div>
+    </a>
+  </div>
+</section>
+
+<!-- ── Visual explainers teaser ─────────────────── -->
+<section class="explainers">
+  <div class="explainers-band">
+    <div class="explainers-text">
+      <h2>Big ideas, made visual</h2>
+      <p>Illustrated explainers for the concepts that trip up beginners most.</p>
+      <a href="#" class="link-arrow">Explore visual guides →</a>
+    </div>
+    <div class="explainers-icons">
+      <div class="explainer-item">
+        <div class="icon-box icon-trinity">
+          <div class="c c1"></div>
+          <div class="c c2"></div>
+          <div class="c c3"></div>
+        </div>
+        <div class="icon-label">The Trinity</div>
+      </div>
+      <div class="explainer-item">
+        <div class="icon-box icon-timeline">
+          <div class="tl-line">
+            <div class="tl-dot"></div>
+            <div class="tl-dot"></div>
+            <div class="tl-dot"></div>
+          </div>
+        </div>
+        <div class="icon-label">Bible timeline</div>
+      </div>
+      <div class="explainer-item">
+        <div class="icon-box icon-oldnew">
+          <div class="half-l"></div>
+          <div class="half-r"></div>
+        </div>
+        <div class="icon-label">Old vs New</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Verse of the day ──────────────────────────── -->
+<section class="verse-section">
+  <div class="verse-card">
+    <div class="verse-label">A verse for you today</div>
+    <p class="verse-text">"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."</p>
+    <div class="verse-ref">John 3:16</div>
+    <button class="btn-share" onclick="shareVerse()">Share this verse</button>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-wordmark">Firstlight</div>
+    <div class="footer-links">
+      <a href="#">Getting started</a>
+      <a href="#">Learning paths</a>
+      <a href="#">Search</a>
+      <a href="#">Ask a question</a>
+    </div>
+    <div class="footer-copy">© 2026 Firstlight</div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('navDropdown').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('navDropdown');
+    if (!e.target.closest('.header-right')) {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  function shareVerse() {
+    alert('Share this verse — generates a ready-to-post image (coming soon).');
+  }
+</script>
+</body>
+</html>
